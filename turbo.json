@@ -8,7 +8,14 @@
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"]
+    },
+    "format": {
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"]
+    },
+    "check": {
+      "inputs": ["$TURBO_DEFAULT$", "biome.json"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
