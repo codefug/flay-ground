@@ -13,6 +13,7 @@
     "dev:pure": "cd apps/pure && python3 -m http.server 8080",
     "dev:react": "turbo run dev --filter=react",
     "dev:next": "turbo run dev --filter=next",
+    "dev:express": "turbo run dev --filter=express",
     "lint": "turbo run lint",
     "format": "biome format --write .",
     "check": "biome check --write .",
