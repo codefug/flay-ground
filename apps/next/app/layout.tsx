@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import { MSWProvider } from "@/components/MSWProvider";
+import { TRPCReactProvider } from "@/trpc/client";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -24,7 +26,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {children}
+        <MSWProvider>
+          <TRPCReactProvider>{children}</TRPCReactProvider>
+        </MSWProvider>
       </body>
     </html>
   );
