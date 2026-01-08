@@ -67,6 +67,28 @@ apps/next/
 └── playwright.config.ts           # Playwright 설정
 ```
 
+## 환경 변수 설정
+
+MSW 사용 여부는 `NEXT_PUBLIC_MSW` 환경 변수로 통일 관리합니다.
+
+### 환경 변수 설정
+
+`.env.local` 파일을 생성하고 다음을 추가하세요:
+
+```bash
+# MSW 활성화 (true/false)
+# true: MSW를 사용하여 API를 모킹
+# false: 실제 API 서버 사용
+NEXT_PUBLIC_MSW=true
+```
+
+### 환경별 기본값
+
+- **개발 환경**: `NEXT_PUBLIC_MSW=true` (MSW 활성화 권장)
+- **Storybook**: 자동으로 `NEXT_PUBLIC_MSW=true` 설정됨
+- **Playwright**: 서버 사이드 MSW 사용 (환경 변수 불필요)
+- **프로덕션**: `NEXT_PUBLIC_MSW=false` (실제 API 사용)
+
 ## 사용 방법
 
 ### 1. 개발 서버 실행
@@ -105,6 +127,8 @@ pnpm test:e2e:ui
 # 디버그 모드로 테스트 실행
 pnpm test:e2e:debug
 ```
+
+**참고**: Playwright는 서버 사이드 MSW를 사용하므로 `NEXT_PUBLIC_MSW` 환경 변수와 무관하게 항상 MSW가 활성화됩니다.
 
 ## tRPC 라우터 예제
 

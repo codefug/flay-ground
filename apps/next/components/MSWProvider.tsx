@@ -6,8 +6,10 @@ export function MSWProvider({ children }: { children: React.ReactNode }) {
   const [mswReady, setMswReady] = useState(false);
 
   useEffect(() => {
-    // 개발 환경에서만 MSW 활성화
-    if (process.env.NODE_ENV !== "development") {
+    // NEXT_PUBLIC_MSW 환경 변수로 MSW 활성화 여부 제어
+    const shouldUseMSW = process.env.NEXT_PUBLIC_MSW === "true";
+
+    if (!shouldUseMSW) {
       setMswReady(true);
       return;
     }

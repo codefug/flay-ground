@@ -40,11 +40,10 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const [trpcClient] = useState(() => {
     // MSW가 활성화된 경우 httpLink 사용 (msw-trpc는 배치 미지원)
     // 프로덕션에서는 httpBatchLink 사용 (성능 최적화)
-    // 환경 변수로 명시적으로 제어 가능: NEXT_PUBLIC_USE_MSW=true
+    // NEXT_PUBLIC_MSW 환경 변수로 MSW 사용 여부 제어
     const useMSW =
       typeof window !== "undefined" &&
-      (process.env.NEXT_PUBLIC_USE_MSW === "true" ||
-        process.env.NODE_ENV === "development");
+      process.env.NEXT_PUBLIC_MSW === "true";
 
     return createTRPCClient<AppRouter>({
       links: [
