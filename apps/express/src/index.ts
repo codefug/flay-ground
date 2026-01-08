@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./swagger";
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -24,12 +26,74 @@ const tokenStore: TokenStore = {};
 app.use(cors());
 app.use(express.json());
 
-// Health check endpoint
+// Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+/**
+ * @openapi
+ * /health:
+ *   get:
+ *     tags:
+ *       - Health
+ *     summary: 헬스 체크
+ *     description: 서버 상태 확인
+ *     responses:
+ *       200:
+ *         description: 서버 정상 작동
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ */
 app.get("/health", (req, res) => {
 	res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
-// 로그인 - accessToken과 refreshToken 발급
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: 로그인
+ *     description: userId를 통해 accessToken과 refreshToken 발급
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 example: user123
+ *     responses:
+ *       200:
+ *         description: 토큰 발급 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 expiresIn:
+ *                   type: number
+ *                   example: 900
+ *       400:
+ *         description: userId가 없음
+ */
 app.post("/api/auth/login", (req, res) => {
 	const { userId } = req.body;
 
@@ -61,7 +125,43 @@ app.post("/api/auth/login", (req, res) => {
 	});
 });
 
-// Refresh Token으로 새로운 Access Token 발급
+/**
+ * @openapi
+ * /api/auth/refresh:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: 토큰 갱신
+ *     description: refreshToken을 사용하여 새로운 accessToken 발급
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 새로운 accessToken 발급 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 expiresIn:
+ *                   type: number
+ *                   example: 900
+ *       400:
+ *         description: refreshToken이 없음
+ *       401:
+ *         description: 유효하지 않거나 만료된 refreshToken
+ */
 app.post("/api/auth/refresh", (req, res) => {
 	const { refreshToken } = req.body;
 
@@ -100,12 +200,69 @@ app.post("/api/auth/refresh", (req, res) => {
 	}
 });
 
-// 현재 저장된 모든 토큰 조회 (개발용)
+/**
+ * @openapi
+ * /api/auth/tokens:
+ *   get:
+ *     tags:
+ *       - Auth
+ *     summary: 모든 토큰 조회 (개발용)
+ *     description: 서버에 저장된 모든 유저의 토큰 정보 조회
+ *     responses:
+ *       200:
+ *         description: 토큰 목록
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               additionalProperties:
+ *                 type: object
+ *                 properties:
+ *                   accessToken:
+ *                     type: string
+ *                   refreshToken:
+ *                     type: string
+ *                   createdAt:
+ *                     type: string
+ *                     format: date-time
+ */
 app.get("/api/auth/tokens", (_req, res) => {
 	res.json(tokenStore);
 });
 
-// 특정 유저의 토큰 조회
+/**
+ * @openapi
+ * /api/auth/tokens/{userId}:
+ *   get:
+ *     tags:
+ *       - Auth
+ *     summary: 특정 유저의 토큰 조회
+ *     description: userId로 특정 유저의 토큰 정보 조회
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 조회할 유저 ID
+ *     responses:
+ *       200:
+ *         description: 토큰 정보
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
+ *                 createdAt:
+ *                   type: string
+ *                   format: date-time
+ *       404:
+ *         description: 해당 유저의 토큰을 찾을 수 없음
+ */
 app.get("/api/auth/tokens/:userId", (req, res) => {
 	const { userId } = req.params;
 	const tokens = tokenStore[userId];
@@ -117,7 +274,40 @@ app.get("/api/auth/tokens/:userId", (req, res) => {
 	res.json(tokens);
 });
 
-// 로그아웃 - 토큰 삭제
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: 로그아웃
+ *     description: 서버에서 유저의 토큰 삭제
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - userId
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 example: user123
+ *     responses:
+ *       200:
+ *         description: 로그아웃 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Logged out successfully
+ *       400:
+ *         description: userId가 없음
+ */
 app.post("/api/auth/logout", (req, res) => {
 	const { userId } = req.body;
 
@@ -130,7 +320,32 @@ app.post("/api/auth/logout", (req, res) => {
 	res.json({ message: "Logged out successfully" });
 });
 
-// Access Token 검증이 필요한 보호된 엔드포인트 예시
+/**
+ * @openapi
+ * /api/protected:
+ *   get:
+ *     tags:
+ *       - Auth
+ *     summary: 보호된 리소스
+ *     description: Access Token 검증이 필요한 엔드포인트 예시
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 접근 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Protected data accessed successfully
+ *                 userId:
+ *                   type: string
+ *       401:
+ *         description: 토큰이 없거나 유효하지 않음
+ */
 app.get("/api/protected", (req, res) => {
 	const authHeader = req.headers.authorization;
 
@@ -153,7 +368,35 @@ app.get("/api/protected", (req, res) => {
 	}
 });
 
-// Example BFF endpoint
+/**
+ * @openapi
+ * /api/hello:
+ *   get:
+ *     tags:
+ *       - Example
+ *     summary: Hello World
+ *     description: BFF 예제 엔드포인트
+ *     responses:
+ *       200:
+ *         description: 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Hello from Express BFF!
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     framework:
+ *                       type: string
+ *                       example: Express
+ *                     version:
+ *                       type: string
+ *                       example: 4.x
+ */
 app.get("/api/hello", (req, res) => {
 	res.json({
 		message: "Hello from Express BFF!",
