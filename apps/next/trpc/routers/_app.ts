@@ -1,15 +1,15 @@
 import { z } from "zod";
-import { baseProcedure, createTRPCRouter } from "../init";
 import {
+  getAllTokens,
+  getProtectedData,
+  getTokenByUserId,
+  health,
   hello,
   login,
-  getProtectedData,
   logout,
-  health,
   refreshToken,
-  getAllTokens,
-  getTokenByUserId,
 } from "@/lib/express-client";
+import { baseProcedure, createTRPCRouter, protectedProcedure } from "../init";
 
 export const appRouter = createTRPCRouter({
   // Health check
@@ -49,16 +49,13 @@ export const appRouter = createTRPCRouter({
     }),
 
   // Protected data query
-  getProtectedData: baseProcedure
-    .input(
-      z.object({
-        accessToken: z.string(),
-      })
-    )
-    .query(async ({ input }) => {
-      const data = await getProtectedData(input.accessToken);
-      return data;
-    }),
+  getProtectedData: protectedProcedure.query(async ({ ctx }) => {
+    const data = await getProtectedData(ctx.accessToken);
+    return {
+      data,
+      accessToken: ctx.accessToken,
+    };
+  }),
 
   // Get all tokens query (dev only)
   getAllTokens: baseProcedure.query(async () => {

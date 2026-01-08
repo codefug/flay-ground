@@ -70,6 +70,8 @@ export const Page: React.FC = () => {
           <span className="tip">Tip</span> Adjust the width of the canvas with
           the{" "}
           <svg
+            aria-label="Adjust the width of the canvas with the Viewports addon in the toolbar"
+            role="img"
             width="10"
             height="10"
             viewBox="0 0 12 12"

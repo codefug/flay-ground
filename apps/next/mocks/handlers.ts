@@ -1,5 +1,5 @@
-import { createTRPCMsw, httpLink } from "msw-trpc";
 import type { RequestHandler } from "msw";
+import { createTRPCMsw, httpLink } from "msw-trpc";
 import superjson from "superjson";
 import type { AppRouter } from "@/trpc/routers/_app";
 
@@ -59,13 +59,13 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Protected data query 모킹
-  trpcMsw.getProtectedData.query(({ input }) => {
-    if (!input || !input.accessToken) {
-      throw new Error("No token provided");
-    }
+  trpcMsw.getProtectedData.query(() => {
     return {
-      message: "Protected data accessed successfully (Mocked)",
-      userId: "mock-user-123",
+      data: {
+        message: "Protected data accessed successfully (Mocked)",
+        userId: "mock-user-123",
+      },
+      accessToken: "mock-access-token-123",
     };
   }),
 
@@ -100,7 +100,7 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Logout mutation 모킹
-  trpcMsw.logout.mutation(({ input }) => {
+  trpcMsw.logout.mutation(() => {
     // input은 선택적이지만 타입 안전성을 위해 받음
     return {
       message: "Logged out successfully (Mocked)",

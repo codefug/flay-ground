@@ -4,7 +4,7 @@
  *
  * Express 서버는 http://localhost:3002 에서 실행됩니다.
  */
-import axios, { AxiosError } from "axios";
+import axios, { type AxiosError } from "axios";
 
 /**
  * Express API의 base URL을 반환합니다.

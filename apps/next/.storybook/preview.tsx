@@ -1,6 +1,5 @@
 import type { Preview } from "@storybook/nextjs-vite";
 import { initialize, mswLoader } from "msw-storybook-addon";
-import React from "react";
 import { handlers } from "../mocks/handlers";
 import { TRPCReactProvider } from "../trpc/client";
 
