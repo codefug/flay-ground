@@ -5,7 +5,6 @@
   "description": "Flay your code. Play your code. This is Flayground.",
   "license": "MIT",
   "author": "codefug",
-  "type": "esm",
   "main": "index.js",
   "scripts": {
     "build": "turbo run build",

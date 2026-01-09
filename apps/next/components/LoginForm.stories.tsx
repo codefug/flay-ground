@@ -28,7 +28,7 @@ export const LoginSuccess: Story = {
             version: "4.x",
           },
         })),
-        trpcMsw.login.mutation(({ input }) => ({
+        trpcMsw.auth.login.mutation(({ input }) => ({
           accessToken: `storybook-access-token-${input.userId}`,
           refreshToken: `storybook-refresh-token-${input.userId}`,
           expiresIn: 900,
@@ -50,7 +50,7 @@ export const LoginError: Story = {
             version: "4.x",
           },
         })),
-        trpcMsw.login.mutation(() => {
+        trpcMsw.auth.login.mutation(() => {
           throw new Error("Authentication failed: Invalid credentials");
         }),
       ],
@@ -70,7 +70,7 @@ export const LoginLoading: Story = {
             version: "4.x",
           },
         })),
-        trpcMsw.login.mutation(async ({ input }) => {
+        trpcMsw.auth.login.mutation(async ({ input }) => {
           await new Promise((resolve) => setTimeout(resolve, 3000));
           return {
             accessToken: `delayed-token-${input.userId}`,
