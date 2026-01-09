@@ -36,7 +36,7 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Login mutation 모킹
-  trpcMsw.login.mutation(({ input }) => {
+  trpcMsw.auth.login.mutation(({ input }) => {
     if (!input || !input.userId) {
       throw new Error("userId is required");
     }
@@ -48,7 +48,7 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Refresh token mutation 모킹
-  trpcMsw.refreshToken.mutation(({ input }) => {
+  trpcMsw.auth.refreshToken.mutation(({ input }) => {
     if (!input || !input.refreshToken) {
       throw new Error("refreshToken is required");
     }
@@ -59,7 +59,7 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Protected data query 모킹
-  trpcMsw.getProtectedData.query(() => {
+  trpcMsw.auth.getProtectedData.query(() => {
     return {
       data: {
         message: "Protected data accessed successfully (Mocked)",
@@ -70,7 +70,7 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Get all tokens query 모킹
-  trpcMsw.getAllTokens.query(() => {
+  trpcMsw.auth.getAllTokens.query(() => {
     return {
       tokens: [
         {
@@ -88,7 +88,7 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Get token by user ID query 모킹
-  trpcMsw.getTokenByUserId.query(({ input }) => {
+  trpcMsw.auth.getTokenByUserId.query(({ input }) => {
     if (!input || !input.userId) {
       throw new Error("userId is required");
     }
@@ -100,7 +100,7 @@ export const handlers: RequestHandler[] = [
   }),
 
   // Logout mutation 모킹
-  trpcMsw.logout.mutation(() => {
+  trpcMsw.auth.logout.mutation(() => {
     // input은 선택적이지만 타입 안전성을 위해 받음
     return {
       message: "Logged out successfully (Mocked)",

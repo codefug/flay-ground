@@ -17,7 +17,7 @@ export function LoginForm() {
   const [userId, setUserId] = useState("");
   const [accessToken, setAccessToken] = useState("");
 
-  const loginMutation = useMutation(trpc.login.mutationOptions());
+  const loginMutation = useMutation(trpc.auth.login.mutationOptions());
   const { data: helloData } = useQuery(trpc.hello.queryOptions());
 
   const handleLogin = () => {

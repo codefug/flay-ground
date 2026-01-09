@@ -19,16 +19,16 @@ export function ApiTestPanel() {
     trpc.hello.queryOptions()
   );
   const { data: allTokensData, refetch: refetchAllTokens } = useQuery(
-    trpc.getAllTokens.queryOptions()
+    trpc.auth.getAllTokens.queryOptions()
   );
   const { data: tokenByUserIdData, refetch: refetchTokenByUserId } = useQuery(
-    trpc.getTokenByUserId.queryOptions(
+    trpc.auth.getTokenByUserId.queryOptions(
       { userId: selectedUserId },
       { enabled: false }
     )
   );
   const { data: protectedData, refetch: refetchProtected } = useQuery(
-    trpc.getProtectedData.queryOptions(
+    trpc.auth.getProtectedData.queryOptions(
       { accessToken } as unknown as undefined,
       {
         enabled: !!accessToken,
@@ -37,9 +37,9 @@ export function ApiTestPanel() {
   );
 
   // Mutations
-  const loginMutation = useMutation(trpc.login.mutationOptions());
-  const refreshTokenMutation = useMutation(trpc.refreshToken.mutationOptions());
-  const logoutMutation = useMutation(trpc.logout.mutationOptions());
+  const loginMutation = useMutation(trpc.auth.login.mutationOptions());
+  const refreshTokenMutation = useMutation(trpc.auth.refreshToken.mutationOptions());
+  const logoutMutation = useMutation(trpc.auth.logout.mutationOptions());
 
   const handleLogin = () => {
     loginMutation.mutate(
