@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { usePerformanceTest } from "./PerformanceTestContext";
 import { IndependentDataItemServerAction } from "./IndependentDataItemServerAction";
+import { usePerformanceTest } from "./PerformanceTestContext";
 
 export function IndependentServerActionComponents() {
   const { requestCount } = usePerformanceTest();
