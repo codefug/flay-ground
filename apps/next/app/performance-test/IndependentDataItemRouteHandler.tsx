@@ -1,17 +1,28 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { fetchRouteHandlerData } from "./utils";
 
 interface IndependentDataItemProps {
   id: number;
+  onComplete?: () => void;
 }
 
-export function IndependentDataItemRouteHandler({ id }: IndependentDataItemProps) {
+export function IndependentDataItemRouteHandler({
+  id,
+  onComplete,
+}: IndependentDataItemProps) {
   const query = useQuery({
     queryKey: ["independent-route-handler", id],
     queryFn: () => fetchRouteHandlerData(id),
   });
+
+  useEffect(() => {
+    if (query.isSuccess || query.isError) {
+      onComplete?.();
+    }
+  }, [query.isSuccess, query.isError, onComplete]);
 
   return (
     <div

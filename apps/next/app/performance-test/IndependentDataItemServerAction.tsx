@@ -1,17 +1,28 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { serverActionFetchData } from "../actions/data";
 
 interface IndependentDataItemProps {
   id: number;
+  onComplete?: () => void;
 }
 
-export function IndependentDataItemServerAction({ id }: IndependentDataItemProps) {
+export function IndependentDataItemServerAction({
+  id,
+  onComplete,
+}: IndependentDataItemProps) {
   const query = useQuery({
     queryKey: ["independent-server-action", id],
     queryFn: () => serverActionFetchData(id),
   });
+
+  useEffect(() => {
+    if (query.isSuccess || query.isError) {
+      onComplete?.();
+    }
+  }, [query.isSuccess, query.isError, onComplete]);
 
   return (
     <div

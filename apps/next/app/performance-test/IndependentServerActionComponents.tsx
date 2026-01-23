@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePerformanceTest } from "./PerformanceTestContext";
 import { IndependentDataItemServerAction } from "./IndependentDataItemServerAction";
 
@@ -9,18 +9,37 @@ export function IndependentServerActionComponents() {
   const [isMounted, setIsMounted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
+  const completedCountRef = useRef(0);
+  const endTimeSetRef = useRef(false);
+
+  const handleComplete = () => {
+    completedCountRef.current += 1;
+    if (
+      completedCountRef.current === requestCount &&
+      startTime &&
+      !endTimeSetRef.current
+    ) {
+      endTimeSetRef.current = true;
+      const end = performance.now();
+      setEndTime(end);
+    }
+  };
 
   const handleMount = () => {
     setIsMounted(true);
     const start = performance.now();
     setStartTime(start);
-
-    // 모든 쿼리가 완료될 때까지 대기
-    setTimeout(() => {
-      const end = performance.now();
-      setEndTime(end);
-    }, 5000); // 충분한 시간 대기
+    completedCountRef.current = 0;
+    endTimeSetRef.current = false;
   };
+
+  useEffect(() => {
+    // 마운트 해제 시 리셋
+    if (!isMounted) {
+      completedCountRef.current = 0;
+      endTimeSetRef.current = false;
+    }
+  }, [isMounted]);
 
   const duration =
     endTime && startTime ? (endTime - startTime).toFixed(2) : null;
@@ -88,6 +107,7 @@ export function IndependentServerActionComponents() {
             <IndependentDataItemServerAction
               key={`server-action-${i + 1}`}
               id={i + 1}
+              onComplete={handleComplete}
             />
           ))}
       </div>
