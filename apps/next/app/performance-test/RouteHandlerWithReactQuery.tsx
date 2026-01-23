@@ -2,17 +2,18 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { REQUEST_COUNT } from "./constants";
+import { usePerformanceTest } from "./PerformanceTestContext";
 import { fetchRouteHandlerData } from "./utils";
 
 export function RouteHandlerWithReactQuery() {
+  const { requestCount } = usePerformanceTest();
   const [isRunning, setIsRunning] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
   const [enabled, setEnabled] = useState(false);
 
   // 모든 쿼리를 항상 생성하되 enabled로 제어
-  const queries = Array.from({ length: REQUEST_COUNT }, (_, i) => {
+  const queries = Array.from({ length: requestCount }, (_, i) => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     return useQuery({
       queryKey: ["route-handler", i + 1],
@@ -77,7 +78,7 @@ export function RouteHandlerWithReactQuery() {
           <strong>총 소요 시간: {duration}ms</strong>
           <br />
           <strong>
-            평균 시간: {(Number(duration) / REQUEST_COUNT).toFixed(2)}ms
+            평균 시간: {(Number(duration) / requestCount).toFixed(2)}ms
           </strong>
         </div>
       )}
