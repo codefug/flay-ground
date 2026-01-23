@@ -34,12 +34,14 @@ export default function PerformanceTestPage() {
           </h2>
           <div style={{ lineHeight: "1.8", color: "#495057" }}>
             <p style={{ marginBottom: "10px" }}>
-              <strong>Server Action은 Next.js에서 순차적으로 실행됩니다.</strong>
+              <strong>
+                Server Action은 Next.js에서 순차적으로 실행됩니다.
+              </strong>
             </p>
             <ul style={{ marginLeft: "20px", marginBottom: "10px" }}>
               <li>
-                <strong>Server Action (직접 호출)</strong>: Promise.all을 사용해도
-                내부적으로 순차 실행되어 총 소요 시간이 길어집니다.
+                <strong>Server Action (직접 호출)</strong>: Promise.all을
+                사용해도 내부적으로 순차 실행되어 총 소요 시간이 길어집니다.
               </li>
               <li>
                 <strong>Route Handler</strong>: HTTP 요청이므로 병렬 실행이
@@ -103,20 +105,22 @@ export default function PerformanceTestPage() {
               border: "1px solid #b3d9ff",
             }}
           >
-            <h2 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px" }}>
+            <h2
+              style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px" }}
+            >
               테스트 목적: 각 컴포넌트가 독립적으로 Query를 실행할 때의 동작
             </h2>
             <div style={{ lineHeight: "1.8", color: "#004085" }}>
               <p style={{ marginBottom: "10px" }}>
-                아래 테스트는 <strong>각각의 독립적인 컴포넌트</strong>가 자신만의
-                useQuery를 가지고, 컴포넌트가 마운트될 때 자동으로 query를
-                실행하는 경우를 시뮬레이션합니다.
+                아래 테스트는 <strong>각각의 독립적인 컴포넌트</strong>가
+                자신만의 useQuery를 가지고, 컴포넌트가 마운트될 때 자동으로
+                query를 실행하는 경우를 시뮬레이션합니다.
               </p>
               <ul style={{ marginLeft: "20px", marginBottom: "10px" }}>
                 <li>
                   <strong>Server Action + 독립 컴포넌트</strong>: 각 컴포넌트가
-                  독립적으로 Server Action을 호출하지만, Server Action의 순차 실행
-                  특성으로 인해 전체적으로는 순차적으로 처리될 수 있습니다.
+                  독립적으로 Server Action을 호출하지만, Server Action의 순차
+                  실행 특성으로 인해 전체적으로는 순차적으로 처리될 수 있습니다.
                 </li>
                 <li>
                   <strong>Route Handler + 독립 컴포넌트</strong>: 각 컴포넌트가
@@ -125,8 +129,8 @@ export default function PerformanceTestPage() {
                 </li>
               </ul>
               <p style={{ margin: 0, fontSize: "14px", color: "#0056b3" }}>
-                이 테스트는 실제 애플리케이션에서 여러 컴포넌트가 동시에 데이터를
-                가져올 때의 동작을 확인합니다.
+                이 테스트는 실제 애플리케이션에서 여러 컴포넌트가 동시에
+                데이터를 가져올 때의 동작을 확인합니다.
               </p>
             </div>
           </div>
