@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+const EXPRESS_API_URL = process.env.EXPRESS_API_URL || "http://localhost:3002";
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -8,12 +10,25 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "id is required" }, { status: 400 });
   }
 
-  // 시뮬레이션을 위한 약간의 지연
-  await new Promise((resolve) => setTimeout(resolve, 10));
+  try {
+    const response = await fetch(`${EXPRESS_API_URL}/api/data?id=${id}`, {
+      cache: "no-store",
+    });
 
-  return NextResponse.json({
-    id: Number(id),
-    data: `Route Handler Data ${id}`,
-    timestamp: Date.now(),
-  });
+    if (!response.ok) {
+      return NextResponse.json(
+        { error: "Failed to fetch from Express" },
+        { status: response.status }
+      );
+    }
+
+    const data = await response.json();
+    return NextResponse.json(data);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch data" },
+      { status: 500 }
+    );
+  }
 }
+
