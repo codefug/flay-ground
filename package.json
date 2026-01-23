@@ -14,6 +14,7 @@
     "dev:react": "turbo run dev --filter=react",
     "dev:next": "turbo run dev --filter=next",
     "dev:express": "turbo run dev --filter=express",
+    "dev:next-express": "concurrently \"pnpm dev:express\" \"pnpm dev:next\" --names \"express,next\" --prefix-colors \"cyan,green\"",
     "lint": "turbo run lint",
     "format": "biome format --write .",
     "check": "biome check --write .",
@@ -21,6 +22,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.10",
+    "concurrently": "^9.2.1",
     "turbo": "^2.7.5",
     "typescript": "5.9.3"
   },
