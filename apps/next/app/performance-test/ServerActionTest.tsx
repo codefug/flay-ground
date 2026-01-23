@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { serverActionFetchData } from "../actions/data";
-import { REQUEST_COUNT, type TestResult } from "./constants";
+import { type TestResult } from "./constants";
+import { usePerformanceTest } from "./PerformanceTestContext";
 
 export function ServerActionTest() {
+  const { requestCount } = usePerformanceTest();
   const [results, setResults] = useState<TestResult>({
     startTime: null,
     endTime: null,
@@ -17,7 +19,7 @@ export function ServerActionTest() {
     const startTime = performance.now();
     setResults({ startTime, endTime: null, data: [] });
 
-    const promises = Array.from({ length: REQUEST_COUNT }, (_, i) =>
+    const promises = Array.from({ length: requestCount }, (_, i) =>
       serverActionFetchData(i + 1)
     );
 
@@ -74,7 +76,7 @@ export function ServerActionTest() {
           <strong>총 소요 시간: {duration}ms</strong>
           <br />
           <strong>
-            평균 시간: {(Number(duration) / REQUEST_COUNT).toFixed(2)}ms
+            평균 시간: {(Number(duration) / requestCount).toFixed(2)}ms
           </strong>
         </div>
       )}
