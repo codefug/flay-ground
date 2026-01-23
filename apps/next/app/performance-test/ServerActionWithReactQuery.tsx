@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { useState } from "react";
 import { serverActionFetchData } from "../actions/data";
 import { usePerformanceTest } from "./PerformanceTestContext";
@@ -12,14 +12,13 @@ export function ServerActionWithReactQuery() {
   const [endTime, setEndTime] = useState<number | null>(null);
   const [enabled, setEnabled] = useState(false);
 
-  // 모든 쿼리를 항상 생성하되 enabled로 제어
-  const queries = Array.from({ length: requestCount }, (_, i) => {
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    return useQuery({
+  // useQueries를 사용하여 병렬 처리
+  const queries = useQueries({
+    queries: Array.from({ length: requestCount }, (_, i) => ({
       queryKey: ["server-action", i + 1],
       queryFn: () => serverActionFetchData(i + 1),
       enabled,
-    });
+    })),
   });
 
   const handleTest = async () => {
