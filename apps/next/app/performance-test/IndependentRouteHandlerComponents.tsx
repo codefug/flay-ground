@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { REQUEST_COUNT } from "./constants";
+import { usePerformanceTest } from "./PerformanceTestContext";
 import { IndependentDataItemRouteHandler } from "./IndependentDataItemRouteHandler";
 
 export function IndependentRouteHandlerComponents() {
+  const { requestCount } = usePerformanceTest();
   const [isMounted, setIsMounted] = useState(false);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [endTime, setEndTime] = useState<number | null>(null);
@@ -82,7 +83,7 @@ export function IndependentRouteHandlerComponents() {
 
       <div style={{ maxHeight: "400px", overflow: "auto" }}>
         {isMounted &&
-          Array.from({ length: REQUEST_COUNT }, (_, i) => (
+          Array.from({ length: requestCount }, (_, i) => (
             <IndependentDataItemRouteHandler
               key={`route-handler-${i + 1}`}
               id={i + 1}
