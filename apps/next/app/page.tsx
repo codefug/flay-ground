@@ -1,102 +1,141 @@
-import { Button } from "@repo/ui/button";
-import Image, { type ImageProps } from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-type Props = Omit<ImageProps, "src"> & {
-  srcLight: string;
-  srcDark: string;
-};
+import { IndependentRouteHandlerComponents } from "./performance-test/IndependentRouteHandlerComponents";
+import { IndependentServerActionComponents } from "./performance-test/IndependentServerActionComponents";
+import { RouteHandlerWithReactQuery } from "./performance-test/RouteHandlerWithReactQuery";
+import { ServerActionWithReactQuery } from "./performance-test/ServerActionWithReactQuery";
+import { RouteHandlerTest } from "./performance-test/RouteHandlerTest";
+import { ServerActionTest } from "./performance-test/ServerActionTest";
 
-const ThemeImage = (props: Props) => {
-  const { srcLight, srcDark, ...rest } = props;
-
+export default function PerformanceTestPage() {
   return (
-    <>
-      <Image {...rest} src={srcLight} className="imgLight" />
-      <Image {...rest} src={srcDark} className="imgDark" />
-    </>
-  );
-};
+    <div style={{ padding: "40px", maxWidth: "1400px", margin: "0 auto" }}>
+      <h1 style={{ marginBottom: "30px" }}>
+        성능 비교 테스트 (30개 요청) - Express 프록시
+      </h1>
 
-export default function Home() {
-  return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <ThemeImage
-          className={styles.logo}
-          srcLight="turborepo-dark.svg"
-          srcDark="turborepo-light.svg"
-          alt="Turborepo logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>apps/web/app/page.tsx</code>
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new/clone?demo-description=Learn+to+implement+a+monorepo+with+a+two+Next.js+sites+that+has+installed+three+local+packages.&demo-image=%2F%2Fimages.ctfassets.net%2Fe5382hct74si%2F4K8ZISWAzJ8X1504ca0zmC%2F0b21a1c6246add355e55816278ef54bc%2FBasic.png&demo-title=Monorepo+with+Turborepo&demo-url=https%3A%2F%2Fexamples-basic-web.vercel.sh%2F&from=templates&project-name=Monorepo+with+Turborepo&repository-name=monorepo-turborepo&repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fturborepo%2Ftree%2Fmain%2Fexamples%2Fbasic&root-directory=apps%2Fdocs&skippable-integrations=1&teamSlug=vercel&utm_source=create-turbo"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://turborepo.com/docs?utm_source"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
+      <div
+        style={{
+          padding: "20px",
+          marginBottom: "30px",
+          background: "#f8f9fa",
+          borderRadius: "8px",
+          border: "1px solid #dee2e6",
+        }}
+      >
+        <h2 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px" }}>
+          중요: Server Action의 순차 실행 특성
+        </h2>
+        <div style={{ lineHeight: "1.8", color: "#495057" }}>
+          <p style={{ marginBottom: "10px" }}>
+            <strong>Server Action은 Next.js에서 순차적으로 실행됩니다.</strong>
+          </p>
+          <ul style={{ marginLeft: "20px", marginBottom: "10px" }}>
+            <li>
+              <strong>Server Action (직접 호출)</strong>: Promise.all을 사용해도
+              내부적으로 순차 실행되어 총 소요 시간이 길어집니다.
+            </li>
+            <li>
+              <strong>Route Handler</strong>: HTTP 요청이므로 병렬 실행이
+              가능하여 더 빠른 성능을 보입니다.
+            </li>
+            <li>
+              <strong>React Query 사용 시</strong>: useQuery를 사용하면 각
+              쿼리가 독립적으로 실행되지만, Server Action의 경우 여전히 순차
+              실행의 영향을 받을 수 있습니다.
+            </li>
+          </ul>
+          <p style={{ margin: 0, fontSize: "14px", color: "#6c757d" }}>
+            이는 Next.js의 Server Action이 서버 컴포넌트와 동일한 실행
+            컨텍스트를 공유하기 때문입니다. 병렬 처리가 필요한 경우 Route
+            Handler를 사용하는 것이 권장됩니다.
+          </p>
         </div>
-        <Button appName="web" className={styles.secondary}>
-          Open alert
-        </Button>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com/templates?search=turborepo&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "20px",
+          marginBottom: "20px",
+        }}
+      >
+        <ServerActionTest />
+        <RouteHandlerTest />
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: "20px",
+        }}
+      >
+        <ServerActionWithReactQuery />
+        <RouteHandlerWithReactQuery />
+      </div>
+
+      {/* 각 컴포넌트에서 독립적으로 query 실행 테스트 */}
+      <div
+        style={{
+          marginTop: "60px",
+          paddingTop: "40px",
+          borderTop: "2px solid #dee2e6",
+        }}
+      >
+        <h1 style={{ marginBottom: "20px" }}>
+          독립 컴포넌트 테스트 (각 컴포넌트에서 개별 Query 실행)
+        </h1>
+
+        <div
+          style={{
+            padding: "20px",
+            marginBottom: "30px",
+            background: "#e7f3ff",
+            borderRadius: "8px",
+            border: "1px solid #b3d9ff",
+          }}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://turborepo.com?utm_source=create-turbo"
-          target="_blank"
-          rel="noopener noreferrer"
+          <h2 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px" }}>
+            테스트 목적: 각 컴포넌트가 독립적으로 Query를 실행할 때의 동작
+          </h2>
+          <div style={{ lineHeight: "1.8", color: "#004085" }}>
+            <p style={{ marginBottom: "10px" }}>
+              아래 테스트는 <strong>각각의 독립적인 컴포넌트</strong>가 자신만의
+              useQuery를 가지고, 컴포넌트가 마운트될 때 자동으로 query를
+              실행하는 경우를 시뮬레이션합니다.
+            </p>
+            <ul style={{ marginLeft: "20px", marginBottom: "10px" }}>
+              <li>
+                <strong>Server Action + 독립 컴포넌트</strong>: 각 컴포넌트가
+                독립적으로 Server Action을 호출하지만, Server Action의 순차 실행
+                특성으로 인해 전체적으로는 순차적으로 처리될 수 있습니다.
+              </li>
+              <li>
+                <strong>Route Handler + 독립 컴포넌트</strong>: 각 컴포넌트가
+                독립적으로 HTTP 요청을 보내므로, 브라우저의 HTTP 클라이언트가
+                병렬로 처리하여 더 빠른 성능을 보입니다.
+              </li>
+            </ul>
+            <p style={{ margin: 0, fontSize: "14px", color: "#0056b3" }}>
+              이 테스트는 실제 애플리케이션에서 여러 컴포넌트가 동시에 데이터를
+              가져올 때의 동작을 확인합니다.
+            </p>
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px",
+          }}
         >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to turborepo.com →
-        </a>
-      </footer>
+          <IndependentServerActionComponents />
+          <IndependentRouteHandlerComponents />
+        </div>
+      </div>
     </div>
   );
 }
