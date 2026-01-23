@@ -20,6 +20,12 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load Inter, a custom Google Font.
 
+## 성능 테스트
+
+이 프로젝트는 Next.js의 Server Actions와 Route Handlers의 성능 차이를 비교하는 테스트 페이지를 포함합니다.
+
+자세한 내용은 [PERFORMANCE_TEST.md](./PERFORMANCE_TEST.md)를 참고하세요.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
