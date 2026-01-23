@@ -1,3 +1,12 @@
+/**
+ * Route Handler 직접 호출 테스트 컴포넌트
+ *
+ * ✓ 병렬 실행: Route Handler는 HTTP 요청이므로 Promise.all을 사용하면
+ * 병렬로 실행되어 더 빠른 성능을 보입니다.
+ *
+ * @see PERFORMANCE_TEST.md - 성능 테스트 문서
+ * @see ServerActionTest - 순차 실행되는 Server Action 테스트
+ */
 "use client";
 
 import { useState } from "react";

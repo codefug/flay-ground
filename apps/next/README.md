@@ -22,9 +22,33 @@ This project uses [`next/font`](https://nextjs.org/docs/app/building-your-applic
 
 ## 성능 테스트
 
-이 프로젝트는 Next.js의 Server Actions와 Route Handlers의 성능 차이를 비교하는 테스트 페이지를 포함합니다.
+이 프로젝트는 Next.js의 **Server Actions**와 **Route Handlers**의 성능 차이를 비교하는 테스트 페이지를 포함합니다.
 
-자세한 내용은 [PERFORMANCE_TEST.md](./PERFORMANCE_TEST.md)를 참고하세요.
+### 빠른 시작
+
+1. **테스트 실행**
+   ```bash
+   pnpm dev:next-express
+   ```
+   브라우저에서 `http://localhost:3000` 접속
+
+2. **주요 발견사항**
+   - Server Actions는 순차 실행되어 데이터 페칭에 비효율적
+   - Route Handlers는 병렬 실행 가능하여 더 빠른 성능 제공
+   - 병렬 처리가 필요한 경우 Route Handler 사용 권장
+
+### 문서
+
+- 📖 [상세 문서](./PERFORMANCE_TEST.md) - 전체 가이드 및 참고 자료
+- 🔍 [키워드 인덱스](./PERFORMANCE_TEST.md#키워드-인덱스) - 빠른 검색
+- 📁 [코드 위치](./PERFORMANCE_TEST.md#테스트-구성) - 파일 구조 및 예제
+
+### 관련 파일
+
+- 테스트 페이지: `app/page.tsx`
+- Server Action: `app/actions/data.ts`
+- Route Handler: `app/api/data/route.ts`
+- 테스트 컴포넌트: `app/performance-test/*.tsx`
 
 ## Learn More
 

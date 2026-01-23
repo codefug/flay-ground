@@ -13,9 +13,31 @@ export default function PerformanceTestPage() {
   return (
     <PerformanceTestProvider>
       <div style={{ padding: "40px", maxWidth: "1400px", margin: "0 auto" }}>
-        <h1 style={{ marginBottom: "30px" }}>
-          성능 비교 테스트 - Express 프록시
-        </h1>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "30px",
+          }}
+        >
+          <h1 style={{ margin: 0 }}>성능 비교 테스트 - Express 프록시</h1>
+          <a
+            href="/PERFORMANCE_TEST.md"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              padding: "8px 16px",
+              background: "#007bff",
+              color: "white",
+              textDecoration: "none",
+              borderRadius: "4px",
+              fontSize: "14px",
+            }}
+          >
+            📖 문서 보기
+          </a>
+        </div>
 
         <RequestCountControl />
 

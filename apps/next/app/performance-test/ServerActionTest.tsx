@@ -1,3 +1,12 @@
+/**
+ * Server Action 직접 호출 테스트 컴포넌트
+ *
+ * ⚠️ 주의: Server Action은 순차 실행되므로 Promise.all을 사용해도
+ * 내부적으로는 순차 실행되어 총 소요 시간이 길어집니다.
+ *
+ * @see PERFORMANCE_TEST.md - 성능 테스트 문서
+ * @see RouteHandlerTest - 병렬 실행 가능한 Route Handler 테스트
+ */
 "use client";
 
 import { useState } from "react";

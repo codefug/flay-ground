@@ -1,8 +1,46 @@
 # 성능 테스트 문서
 
+> **빠른 시작**: 테스트 페이지는 `http://localhost:3000`에서 확인할 수 있습니다.  
+> **관련 파일**: `app/page.tsx`, `app/actions/data.ts`, `app/api/data/route.ts`
+
+## 목차
+
+- [개요](#개요)
+- [빠른 참조](#빠른-참조)
+- [테스트 시나리오](#테스트-시나리오)
+- [주요 발견사항](#주요-발견사항)
+- [테스트 구성](#테스트-구성)
+- [실행 방법](#실행-방법)
+- [참고 문서](#참고-문서)
+- [결론](#결론)
+- [키워드 인덱스](#키워드-인덱스)
+
 ## 개요
 
 이 프로젝트는 Next.js의 **Server Actions**와 **Route Handlers**의 성능 차이를 비교하는 테스트 페이지를 제공합니다. 특히 Server Actions의 순차 실행 특성과 Route Handlers의 병렬 실행 특성을 실제로 측정하고 비교할 수 있습니다.
+
+## 빠른 참조
+
+### 핵심 개념
+
+| 개념 | 설명 | 관련 파일 |
+|------|------|-----------|
+| **Server Actions** | 순차 실행됨. 데이터 페칭에 사용 시 성능 저하 | `app/actions/data.ts` |
+| **Route Handlers** | 병렬 실행 가능. HTTP 요청으로 처리 | `app/api/data/route.ts` |
+| **useQueries** | 여러 쿼리를 병렬로 실행 | `app/performance-test/*.tsx` |
+
+### 테스트 유형
+
+1. **직접 호출**: `Promise.all`로 직접 호출 비교
+2. **React Query 통합**: `useQueries`를 사용한 비교
+3. **독립 컴포넌트**: 각 컴포넌트가 독립적으로 실행하는 경우
+
+### 주요 키워드
+
+- `Server Actions` - 순차 실행, 데이터 페칭 비권장
+- `Route Handlers` - 병렬 실행, 성능 최적화
+- `useQueries` - 병렬 쿼리 실행
+- `Promise.all` - 병렬 처리 (Route Handler에서만 효과적)
 
 ## 테스트 시나리오
 
@@ -41,10 +79,12 @@ Route Handlers는 일반적인 HTTP 요청이므로 브라우저의 네트워크
 
 ### Express 프록시 서버
 
+**파일 위치**: `apps/express/src/index.ts`
+
 모든 테스트는 Express 서버(`http://localhost:3002`)를 프록시로 사용합니다:
 
 ```typescript
-// Express API 엔드포인트
+// apps/express/src/index.ts
 app.get("/api/data", (req, res) => {
   const id = req.query.id;
   // 10ms 지연 시뮬레이션
@@ -60,7 +100,10 @@ app.get("/api/data", (req, res) => {
 
 ### Server Action 구현
 
+**파일 위치**: `app/actions/data.ts`
+
 ```typescript
+// app/actions/data.ts
 "use server";
 
 export async function serverActionFetchData(id: number) {
@@ -74,9 +117,14 @@ export async function serverActionFetchData(id: number) {
 }
 ```
 
+**사용 예시**: `app/performance-test/ServerActionTest.tsx`, `app/performance-test/ServerActionWithReactQuery.tsx`
+
 ### Route Handler 구현
 
+**파일 위치**: `app/api/data/route.ts`
+
 ```typescript
+// app/api/data/route.ts
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id");
@@ -95,6 +143,24 @@ export async function GET(request: Request) {
   const data = await response.json();
   return NextResponse.json(data);
 }
+```
+
+**사용 예시**: `app/performance-test/RouteHandlerTest.tsx`, `app/performance-test/RouteHandlerWithReactQuery.tsx`
+
+### 테스트 컴포넌트 구조
+
+```
+app/performance-test/
+├── PerformanceTestContext.tsx      # 요청 개수 관리 Context
+├── RequestCountControl.tsx         # 요청 개수 조절 UI
+├── ServerActionTest.tsx            # Server Action 직접 호출 테스트
+├── RouteHandlerTest.tsx            # Route Handler 직접 호출 테스트
+├── ServerActionWithReactQuery.tsx  # Server Action + useQueries
+├── RouteHandlerWithReactQuery.tsx  # Route Handler + useQueries
+├── IndependentServerActionComponents.tsx  # 독립 컴포넌트 (Server Action)
+├── IndependentRouteHandlerComponents.tsx  # 독립 컴포넌트 (Route Handler)
+├── IndependentDataItemServerAction.tsx    # 개별 아이템 컴포넌트
+└── IndependentDataItemRouteHandler.tsx    # 개별 아이템 컴포넌트
 ```
 
 ## 실행 방법
@@ -144,3 +210,35 @@ export async function GET(request: Request) {
 1. **네트워크 탭 확인**: 브라우저 개발자 도구의 Network 탭에서 요청 순서 확인
 2. **타이밍 측정**: 각 테스트의 총 소요 시간과 평균 시간 비교
 3. **컴포넌트별 동작**: 독립 컴포넌트가 마운트될 때의 동작 패턴 관찰
+
+## 키워드 인덱스
+
+### 검색 키워드
+
+다음 키워드로 관련 내용을 빠르게 찾을 수 있습니다:
+
+- **순차 실행** → [Server Actions의 순차 실행 특성](#server-actions의-순차-실행-특성)
+- **병렬 실행** → [Route Handlers의 병렬 실행](#route-handlers의-병렬-실행)
+- **useQueries** → [React Query 통합 테스트](#2-react-query-통합-테스트)
+- **Promise.all** → [직접 호출 테스트](#1-직접-호출-테스트)
+- **독립 컴포넌트** → [독립 컴포넌트 테스트](#3-독립-컴포넌트-테스트)
+- **성능 비교** → [결론](#결론)
+- **Next.js 공식 문서** → [참고 문서](#참고-문서)
+
+### 파일별 검색
+
+특정 파일을 찾고 싶다면:
+
+- **Server Action 코드**: `app/actions/data.ts`
+- **Route Handler 코드**: `app/api/data/route.ts`
+- **테스트 페이지**: `app/page.tsx`
+- **테스트 컴포넌트**: `app/performance-test/*.tsx`
+- **Express 서버**: `apps/express/src/index.ts`
+
+### 문제 해결
+
+| 문제 | 해결 방법 | 관련 섹션 |
+|------|-----------|-----------|
+| Server Action이 느림 | Route Handler 사용 | [결론](#결론) |
+| 병렬 실행이 안됨 | `useQueries` 또는 Route Handler 사용 | [테스트 시나리오](#테스트-시나리오) |
+| 테스트 페이지 접속 불가 | Express 서버 실행 확인 | [실행 방법](#실행-방법) |
