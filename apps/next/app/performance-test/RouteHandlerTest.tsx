@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { REQUEST_COUNT, type TestResult } from "./constants";
+import { type TestResult } from "./constants";
 import { fetchRouteHandlerData } from "./utils";
+import { usePerformanceTest } from "./PerformanceTestContext";
 
 export function RouteHandlerTest() {
+  const { requestCount } = usePerformanceTest();
   const [results, setResults] = useState<TestResult>({
     startTime: null,
     endTime: null,
@@ -17,7 +19,7 @@ export function RouteHandlerTest() {
     const startTime = performance.now();
     setResults({ startTime, endTime: null, data: [] });
 
-    const promises = Array.from({ length: REQUEST_COUNT }, (_, i) =>
+    const promises = Array.from({ length: requestCount }, (_, i) =>
       fetchRouteHandlerData(i + 1)
     );
 
@@ -73,7 +75,7 @@ export function RouteHandlerTest() {
           <strong>총 소요 시간: {duration}ms</strong>
           <br />
           <strong>
-            평균 시간: {(Number(duration) / REQUEST_COUNT).toFixed(2)}ms
+            평균 시간: {(Number(duration) / requestCount).toFixed(2)}ms
           </strong>
         </div>
       )}
