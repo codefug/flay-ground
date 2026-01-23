@@ -2,27 +2,33 @@
 
 import { IndependentRouteHandlerComponents } from "./performance-test/IndependentRouteHandlerComponents";
 import { IndependentServerActionComponents } from "./performance-test/IndependentServerActionComponents";
-import { RouteHandlerWithReactQuery } from "./performance-test/RouteHandlerWithReactQuery";
-import { ServerActionWithReactQuery } from "./performance-test/ServerActionWithReactQuery";
+import { PerformanceTestProvider } from "./performance-test/PerformanceTestContext";
+import { RequestCountControl } from "./performance-test/RequestCountControl";
 import { RouteHandlerTest } from "./performance-test/RouteHandlerTest";
+import { RouteHandlerWithReactQuery } from "./performance-test/RouteHandlerWithReactQuery";
 import { ServerActionTest } from "./performance-test/ServerActionTest";
+import { ServerActionWithReactQuery } from "./performance-test/ServerActionWithReactQuery";
 
 export default function PerformanceTestPage() {
   return (
-    <div style={{ padding: "40px", maxWidth: "1400px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "30px" }}>
-        성능 비교 테스트 (30개 요청) - Express 프록시
-      </h1>
+    <PerformanceTestProvider>
+      <div style={{ padding: "40px", maxWidth: "1400px", margin: "0 auto" }}>
+        <h1 style={{ marginBottom: "30px" }}>
+          성능 비교 테스트 - Express 프록시
+        </h1>
 
-      <div
-        style={{
-          padding: "20px",
-          marginBottom: "30px",
-          background: "#f8f9fa",
-          borderRadius: "8px",
-          border: "1px solid #dee2e6",
-        }}
-      >
+        <RequestCountControl />
+
+        <div
+          style={{
+            padding: "20px",
+            marginTop: "30px",
+            marginBottom: "30px",
+            background: "#f8f9fa",
+            borderRadius: "8px",
+            border: "1px solid #dee2e6",
+          }}
+        >
         <h2 style={{ marginTop: 0, marginBottom: "15px", fontSize: "18px" }}>
           중요: Server Action의 순차 실행 특성
         </h2>
@@ -136,6 +142,6 @@ export default function PerformanceTestPage() {
           <IndependentRouteHandlerComponents />
         </div>
       </div>
-    </div>
+    </PerformanceTestProvider>
   );
 }
