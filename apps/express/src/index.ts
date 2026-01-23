@@ -407,6 +407,53 @@ app.get("/api/hello", (req, res) => {
 	});
 });
 
+/**
+ * @openapi
+ * /api/data:
+ *   get:
+ *     tags:
+ *       - Example
+ *     summary: 데이터 조회 (성능 테스트용)
+ *     description: 성능 비교 테스트를 위한 데이터 엔드포인트
+ *     parameters:
+ *       - in: query
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: number
+ *         description: 데이터 ID
+ *     responses:
+ *       200:
+ *         description: 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: number
+ *                 data:
+ *                   type: string
+ *                 timestamp:
+ *                   type: number
+ */
+app.get("/api/data", (req, res) => {
+	const id = req.query.id;
+
+	if (!id) {
+		return res.status(400).json({ error: "id is required" });
+	}
+
+	// 시뮬레이션을 위한 약간의 지연
+	setTimeout(() => {
+		res.json({
+			id: Number(id),
+			data: `Express Data ${id}`,
+			timestamp: Date.now(),
+		});
+	}, 10);
+});
+
 // Start server
 app.listen(PORT, () => {
 	console.log(`🚀 Express server running on http://localhost:${PORT}`);
