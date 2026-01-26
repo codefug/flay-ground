@@ -22,21 +22,6 @@ export default function PerformanceTestPage() {
           }}
         >
           <h1 style={{ margin: 0 }}>성능 비교 테스트 - Express 프록시</h1>
-          <a
-            href="/PERFORMANCE_TEST.md"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              padding: "8px 16px",
-              background: "#007bff",
-              color: "white",
-              textDecoration: "none",
-              borderRadius: "4px",
-              fontSize: "14px",
-            }}
-          >
-            📖 문서 보기
-          </a>
         </div>
 
         <RequestCountControl />
