@@ -454,6 +454,48 @@ app.get("/api/data", (req, res) => {
 	}, 10);
 });
 
+/**
+ * @openapi
+ * /api/ip:
+ *   get:
+ *     tags:
+ *       - Example
+ *     summary: IP 주소 조회
+ *     description: 클라이언트의 IP 주소를 반환합니다
+ *     responses:
+ *       200:
+ *         description: 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ip:
+ *                   type: string
+ *                   example: "192.168.1.1"
+ *                 forwarded:
+ *                   type: string
+ *                   example: "192.168.1.1"
+ *                 realIp:
+ *                   type: string
+ *                   example: "192.168.1.1"
+ *                 remoteAddress:
+ *                   type: string
+ *                   example: "::1"
+ */
+app.get("/api/ip", (req, res) => {
+	const ip = req.headers["x-forwarded-for"] ||
+	           req.headers["x-real-ip"] ||
+	           req.socket.remoteAddress;
+
+	res.json({
+		ip,
+		forwarded: req.headers["x-forwarded-for"],
+		realIp: req.headers["x-real-ip"],
+		remoteAddress: req.socket.remoteAddress,
+	});
+});
+
 // Start server
 app.listen(PORT, () => {
 	console.log(`🚀 Express server running on http://localhost:${PORT}`);
