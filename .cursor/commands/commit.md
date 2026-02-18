@@ -1,34 +1,38 @@
-현재 작업 단위와 이전 작업 단위에서 문제가 되는 경우가 있는지 판단하고 없는 경우 다음의 커밋 규칙을 기반으로 커밋을 진행합니다. 추가적인 메시지가 없이 해당 문서를 읽고 있다면 추적되지 않은 파일과 스테이징 파일을 모두 커밋합니다. ( git add 명령어로 추적되지 않은 파일과 스테이징 파일을 모두 추적하도록 변경 후 커밋 )
+# commit message guidelines:
 
-# 커밋 규칙
+please divide the commit message into the smallest unit of work and commit each unit of work.
 
-<커밋 접두사>: <커밋 한글 메시지>
+If there is a problem in the current work unit and the previous work unit, determine if there is a problem and if there is no problem, commit based on the following commit rules. If there is no additional message while reading this document, commit all untracked files and staging files. ( git add command to track all untracked files and staging files )
 
-## 커밋 접두사 규칙
+## commit message rules:
 
-- feat: 새로운 기능 추가
-- fix: 버그 수정
-- refactor: 코드 리팩토링
-- chore: 빌드 및 테스트 작업
-- docs: 문서 수정
-- test: 테스트 코드 추가 또는 수정
-- style: 코드 스타일 수정
-- perf: 성능 개선
-- ci: 지속적 통합 작업
-- revert: 이전 커밋 되돌리기
-- build: 빌드 관련 작업
-- release: 릴리스 작업
-- revert: 이전 커밋 되돌리기
+<commit prefix>: <commit message>
 
-## 커밋 메시지 규칙
+### commit prefix rules:
 
-- 커밋 메시지는 한글로 작성합니다.
-- 커밋 메시지는 최대 50자 이내로 작성합니다.
-- 커밋 메시지는 카멜 케이스로 작성합니다.
-- 커밋 메시지는 동사로 시작합니다.
-- 커밋 메시지는 명령형으로 작성합니다.
-- 커밋 메시지는 명사로 끝나지 않습니다.
+- feat: add new feature
+- fix: fix bug
+- refactor: refactor code
+- chore: build and test
+- docs: update documentation
+- test: add or update test code
+- style: update code style
+- perf: improve performance
+- ci: continuous integration
+- revert: revert previous commit
+- build: build-related tasks
+- release: release
+- revert: revert previous commit
 
-## 커밋 메시지 예시
+## commit message rules:
+
+- commit message is written in korean.
+- commit message is written in maximum 50 characters.
+- commit message is written in camel case.
+- commit message starts with a verb.
+- commit message is written in imperative mood.
+- commit message does not end with a noun.
+
+## commit message example:
 
 feat: 로그인 기능 추가
