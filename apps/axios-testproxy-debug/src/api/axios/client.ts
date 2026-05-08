@@ -9,7 +9,4 @@ export const client = axios.create({
     "Content-Type": "application/json",
   },
   timeout: 10_000,
-  // testProxy 인터셉션을 위해 fetch adapter 필요
-  // http adapter는 Node.js http 모듈을 직접 사용해 testProxy를 우회함
-  adapter: "fetch",
 });
