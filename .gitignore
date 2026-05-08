@@ -40,3 +40,7 @@ yarn-error.log*
 # ai
 /.omc
 /.claude
+
+# Playwright
+playwright-report
+blob-report
