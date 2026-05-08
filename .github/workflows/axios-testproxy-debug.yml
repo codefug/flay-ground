@@ -6,11 +6,13 @@ on:
     paths:
       - "apps/axios-testproxy-debug/**"
       - ".github/workflows/axios-testproxy-debug.yml"
+      - "pnpm-lock.yaml"
   pull_request:
     branches: [main]
     paths:
       - "apps/axios-testproxy-debug/**"
       - ".github/workflows/axios-testproxy-debug.yml"
+      - "pnpm-lock.yaml"
   workflow_dispatch:
     inputs:
       axios_version:
