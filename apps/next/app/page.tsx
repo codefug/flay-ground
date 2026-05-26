@@ -1,5 +1,6 @@
 import { Button } from "@repo/ui/button";
 import Image, { type ImageProps } from "next/image";
+import Link from "next/link";
 import styles from "./page.module.css";
 
 type Props = Omit<ImageProps, "src"> & {
@@ -22,6 +23,8 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+        <Link href={"/search-params-suspense/global-suspense"}>전역</Link>
+        <Link href={"/search-params-suspense/local-suspense"}>로컬</Link>
         <ThemeImage
           className={styles.logo}
           srcLight="turborepo-dark.svg"
