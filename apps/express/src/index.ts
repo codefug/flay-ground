@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import swaggerUi from "swagger-ui-express";
+import { addMessage, ee, listMessages, messagesAfter } from "./events";
 import { swaggerSpec } from "./swagger";
 
 const app = express();
@@ -23,7 +24,14 @@ interface TokenStore {
 const tokenStore: TokenStore = {};
 
 // Middleware
-app.use(cors());
+// SSE는 EventSource로 붙기 때문에 credentials와 명시적 origin이 필요하다.
+// (credentials: true일 때 origin에 "*"를 쓸 수 없다)
+app.use(
+	cors({
+		origin: ["http://localhost:3000", "http://localhost:3001"],
+		credentials: true,
+	}),
+);
 app.use(express.json());
 
 // Swagger UI
@@ -404,6 +412,89 @@ app.get("/api/hello", (req, res) => {
 			framework: "Express",
 			version: "4.x",
 		},
+	});
+});
+
+/**
+ * @openapi
+ * /api/chat/messages:
+ *   get:
+ *     tags:
+ *       - Chat
+ *     summary: 메시지 목록 조회
+ *     responses:
+ *       200:
+ *         description: 메시지 배열
+ */
+app.get("/api/chat/messages", (_req, res) => {
+	res.json(listMessages());
+});
+
+/**
+ * @openapi
+ * /api/chat/messages:
+ *   post:
+ *     tags:
+ *       - Chat
+ *     summary: 메시지 전송
+ *     responses:
+ *       201:
+ *         description: 생성된 메시지
+ *       400:
+ *         description: author 또는 text 누락
+ */
+app.post("/api/chat/messages", (req, res) => {
+	const { author, text } = req.body;
+
+	if (!author || !text) {
+		return res.status(400).json({ error: "author and text are required" });
+	}
+
+	res.status(201).json(addMessage(author, text));
+});
+
+/**
+ * @openapi
+ * /api/chat/stream:
+ *   get:
+ *     tags:
+ *       - Chat
+ *     summary: 메시지 SSE 스트림 (도메인 레벨)
+ *     description: BFF(tRPC)가 소비하는 원본 스트림. 브라우저가 직접 붙지 않는다.
+ *     responses:
+ *       200:
+ *         description: text/event-stream
+ */
+app.get("/api/chat/stream", (req, res) => {
+	res.writeHead(200, {
+		"Content-Type": "text/event-stream",
+		"Cache-Control": "no-cache, no-transform",
+		Connection: "keep-alive",
+		// nginx 등 프록시가 스트림을 버퍼링하지 않도록
+		"X-Accel-Buffering": "no",
+	});
+
+	// 재연결 시 놓친 메시지부터 복구
+	const lastEventId = (req.headers["last-event-id"] ??
+		req.query.lastEventId) as string | undefined;
+	if (lastEventId) {
+		for (const message of messagesAfter(lastEventId)) {
+			res.write(`id: ${message.id}\ndata: ${JSON.stringify(message)}\n\n`);
+		}
+	}
+
+	const onAdd = (message: { id: string }) => {
+		res.write(`id: ${message.id}\ndata: ${JSON.stringify(message)}\n\n`);
+	};
+	ee.on("chat:add", onAdd);
+
+	// 유휴 연결이 끊기지 않도록 주기적으로 주석 프레임을 보낸다
+	const ping = setInterval(() => res.write(": ping\n\n"), 15_000);
+
+	req.on("close", () => {
+		clearInterval(ping);
+		ee.off("chat:add", onAdd);
+		res.end();
 	});
 });
 
