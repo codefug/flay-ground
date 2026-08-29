@@ -11,3 +11,7 @@ pnpm dev:pure
 pnpm dev:react
 pnpm dev:web
 ```
+
+# 문서
+
+- [tRPC SSE 코드 읽기](docs/trpc-sse.md) — Next.js BFF에서 express의 SSE를 중계하는 구조. 개념·네트워크 패킷·파일별 해설
