@@ -1,5 +1,5 @@
-import express from "express";
 import cors from "cors";
+import express from "express";
 import jwt from "jsonwebtoken";
 import swaggerUi from "swagger-ui-express";
 import { addMessage, ee, listMessages, messagesAfter } from "./events";
@@ -14,11 +14,11 @@ const REFRESH_TOKEN_SECRET = "your-refresh-token-secret-key";
 
 // 토큰 저장소 (서버 전역 변수)
 interface TokenStore {
-	[userId: string]: {
-		refreshToken: string;
-		accessToken: string;
-		createdAt: Date;
-	};
+  [userId: string]: {
+    refreshToken: string;
+    accessToken: string;
+    createdAt: Date;
+  };
 }
 
 const tokenStore: TokenStore = {};
@@ -27,10 +27,10 @@ const tokenStore: TokenStore = {};
 // SSE는 EventSource로 붙기 때문에 credentials와 명시적 origin이 필요하다.
 // (credentials: true일 때 origin에 "*"를 쓸 수 없다)
 app.use(
-	cors({
-		origin: ["http://localhost:3000", "http://localhost:3001"],
-		credentials: true,
-	}),
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    credentials: true,
+  })
 );
 app.use(express.json());
 
@@ -61,7 +61,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *                   format: date-time
  */
 app.get("/health", (req, res) => {
-	res.json({ status: "ok", timestamp: new Date().toISOString() });
+  res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
 
 /**
@@ -103,34 +103,34 @@ app.get("/health", (req, res) => {
  *         description: userId가 없음
  */
 app.post("/api/auth/login", (req, res) => {
-	const { userId } = req.body;
+  const { userId } = req.body;
 
-	if (!userId) {
-		return res.status(400).json({ error: "userId is required" });
-	}
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required" });
+  }
 
-	// Access Token 생성 (15분 유효)
-	const accessToken = jwt.sign({ userId }, ACCESS_TOKEN_SECRET, {
-		expiresIn: "15m",
-	});
+  // Access Token 생성 (15분 유효)
+  const accessToken = jwt.sign({ userId }, ACCESS_TOKEN_SECRET, {
+    expiresIn: "15m",
+  });
 
-	// Refresh Token 생성 (7일 유효)
-	const refreshToken = jwt.sign({ userId }, REFRESH_TOKEN_SECRET, {
-		expiresIn: "7d",
-	});
+  // Refresh Token 생성 (7일 유효)
+  const refreshToken = jwt.sign({ userId }, REFRESH_TOKEN_SECRET, {
+    expiresIn: "7d",
+  });
 
-	// 토큰 저장소에 저장
-	tokenStore[userId] = {
-		accessToken,
-		refreshToken,
-		createdAt: new Date(),
-	};
+  // 토큰 저장소에 저장
+  tokenStore[userId] = {
+    accessToken,
+    refreshToken,
+    createdAt: new Date(),
+  };
 
-	res.json({
-		accessToken,
-		refreshToken,
-		expiresIn: 900, // 15분 = 900초
-	});
+  res.json({
+    accessToken,
+    refreshToken,
+    expiresIn: 900, // 15분 = 900초
+  });
 });
 
 /**
@@ -171,41 +171,41 @@ app.post("/api/auth/login", (req, res) => {
  *         description: 유효하지 않거나 만료된 refreshToken
  */
 app.post("/api/auth/refresh", (req, res) => {
-	const { refreshToken } = req.body;
+  const { refreshToken } = req.body;
 
-	if (!refreshToken) {
-		return res.status(400).json({ error: "refreshToken is required" });
-	}
+  if (!refreshToken) {
+    return res.status(400).json({ error: "refreshToken is required" });
+  }
 
-	try {
-		// Refresh Token 검증
-		const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as {
-			userId: string;
-		};
+  try {
+    // Refresh Token 검증
+    const decoded = jwt.verify(refreshToken, REFRESH_TOKEN_SECRET) as {
+      userId: string;
+    };
 
-		// 저장소에서 해당 토큰 확인
-		const storedToken = tokenStore[decoded.userId];
-		if (!storedToken || storedToken.refreshToken !== refreshToken) {
-			return res.status(401).json({ error: "Invalid refresh token" });
-		}
+    // 저장소에서 해당 토큰 확인
+    const storedToken = tokenStore[decoded.userId];
+    if (!storedToken || storedToken.refreshToken !== refreshToken) {
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
 
-		// 새로운 Access Token 생성
-		const newAccessToken = jwt.sign(
-			{ userId: decoded.userId },
-			ACCESS_TOKEN_SECRET,
-			{ expiresIn: "15m" },
-		);
+    // 새로운 Access Token 생성
+    const newAccessToken = jwt.sign(
+      { userId: decoded.userId },
+      ACCESS_TOKEN_SECRET,
+      { expiresIn: "15m" }
+    );
 
-		// 저장소 업데이트
-		tokenStore[decoded.userId].accessToken = newAccessToken;
+    // 저장소 업데이트
+    tokenStore[decoded.userId].accessToken = newAccessToken;
 
-		res.json({
-			accessToken: newAccessToken,
-			expiresIn: 900,
-		});
-	} catch {
-		res.status(401).json({ error: "Invalid or expired refresh token" });
-	}
+    res.json({
+      accessToken: newAccessToken,
+      expiresIn: 900,
+    });
+  } catch {
+    res.status(401).json({ error: "Invalid or expired refresh token" });
+  }
 });
 
 /**
@@ -235,7 +235,7 @@ app.post("/api/auth/refresh", (req, res) => {
  *                     format: date-time
  */
 app.get("/api/auth/tokens", (_req, res) => {
-	res.json(tokenStore);
+  res.json(tokenStore);
 });
 
 /**
@@ -272,14 +272,14 @@ app.get("/api/auth/tokens", (_req, res) => {
  *         description: 해당 유저의 토큰을 찾을 수 없음
  */
 app.get("/api/auth/tokens/:userId", (req, res) => {
-	const { userId } = req.params;
-	const tokens = tokenStore[userId];
+  const { userId } = req.params;
+  const tokens = tokenStore[userId];
 
-	if (!tokens) {
-		return res.status(404).json({ error: "Tokens not found for this user" });
-	}
+  if (!tokens) {
+    return res.status(404).json({ error: "Tokens not found for this user" });
+  }
 
-	res.json(tokens);
+  res.json(tokens);
 });
 
 /**
@@ -317,15 +317,15 @@ app.get("/api/auth/tokens/:userId", (req, res) => {
  *         description: userId가 없음
  */
 app.post("/api/auth/logout", (req, res) => {
-	const { userId } = req.body;
+  const { userId } = req.body;
 
-	if (!userId) {
-		return res.status(400).json({ error: "userId is required" });
-	}
+  if (!userId) {
+    return res.status(400).json({ error: "userId is required" });
+  }
 
-	delete tokenStore[userId];
+  delete tokenStore[userId];
 
-	res.json({ message: "Logged out successfully" });
+  res.json({ message: "Logged out successfully" });
 });
 
 /**
@@ -355,25 +355,25 @@ app.post("/api/auth/logout", (req, res) => {
  *         description: 토큰이 없거나 유효하지 않음
  */
 app.get("/api/protected", (req, res) => {
-	const authHeader = req.headers.authorization;
+  const authHeader = req.headers.authorization;
 
-	if (!authHeader || !authHeader.startsWith("Bearer ")) {
-		return res.status(401).json({ error: "No token provided" });
-	}
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "No token provided" });
+  }
 
-	const token = authHeader.split(" ")[1];
+  const token = authHeader.split(" ")[1];
 
-	try {
-		const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as {
-			userId: string;
-		};
-		res.json({
-			message: "Protected data accessed successfully",
-			userId: decoded.userId,
-		});
-	} catch {
-		res.status(401).json({ error: "Invalid or expired token" });
-	}
+  try {
+    const decoded = jwt.verify(token, ACCESS_TOKEN_SECRET) as {
+      userId: string;
+    };
+    res.json({
+      message: "Protected data accessed successfully",
+      userId: decoded.userId,
+    });
+  } catch {
+    res.status(401).json({ error: "Invalid or expired token" });
+  }
 });
 
 /**
@@ -406,13 +406,13 @@ app.get("/api/protected", (req, res) => {
  *                       example: 4.x
  */
 app.get("/api/hello", (req, res) => {
-	res.json({
-		message: "Hello from Express BFF!",
-		data: {
-			framework: "Express",
-			version: "4.x",
-		},
-	});
+  res.json({
+    message: "Hello from Express BFF!",
+    data: {
+      framework: "Express",
+      version: "4.x",
+    },
+  });
 });
 
 /**
@@ -427,7 +427,7 @@ app.get("/api/hello", (req, res) => {
  *         description: 메시지 배열
  */
 app.get("/api/chat/messages", (_req, res) => {
-	res.json(listMessages());
+  res.json(listMessages());
 });
 
 /**
@@ -444,13 +444,13 @@ app.get("/api/chat/messages", (_req, res) => {
  *         description: author 또는 text 누락
  */
 app.post("/api/chat/messages", (req, res) => {
-	const { author, text } = req.body;
+  const { author, text } = req.body;
 
-	if (!author || !text) {
-		return res.status(400).json({ error: "author and text are required" });
-	}
+  if (!author || !text) {
+    return res.status(400).json({ error: "author and text are required" });
+  }
 
-	res.status(201).json(addMessage(author, text));
+  res.status(201).json(addMessage(author, text));
 });
 
 /**
@@ -466,39 +466,40 @@ app.post("/api/chat/messages", (req, res) => {
  *         description: text/event-stream
  */
 app.get("/api/chat/stream", (req, res) => {
-	res.writeHead(200, {
-		"Content-Type": "text/event-stream",
-		"Cache-Control": "no-cache, no-transform",
-		Connection: "keep-alive",
-		// nginx 등 프록시가 스트림을 버퍼링하지 않도록
-		"X-Accel-Buffering": "no",
-	});
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream",
+    "Cache-Control": "no-cache, no-transform",
+    Connection: "keep-alive",
+    // nginx 등 프록시가 스트림을 버퍼링하지 않도록
+    "X-Accel-Buffering": "no",
+  });
 
-	// 재연결 시 놓친 메시지부터 복구
-	const lastEventId = (req.headers["last-event-id"] ??
-		req.query.lastEventId) as string | undefined;
-	if (lastEventId) {
-		for (const message of messagesAfter(lastEventId)) {
-			res.write(`id: ${message.id}\ndata: ${JSON.stringify(message)}\n\n`);
-		}
-	}
+  // 재연결 시 놓친 메시지부터 복구
+  const lastEventId = (req.headers["last-event-id"] ?? req.query.lastEventId) as
+    | string
+    | undefined;
+  if (lastEventId) {
+    for (const message of messagesAfter(lastEventId)) {
+      res.write(`id: ${message.id}\ndata: ${JSON.stringify(message)}\n\n`);
+    }
+  }
 
-	const onAdd = (message: { id: string }) => {
-		res.write(`id: ${message.id}\ndata: ${JSON.stringify(message)}\n\n`);
-	};
-	ee.on("chat:add", onAdd);
+  const onAdd = (message: { id: string }) => {
+    res.write(`id: ${message.id}\ndata: ${JSON.stringify(message)}\n\n`);
+  };
+  ee.on("chat:add", onAdd);
 
-	// 유휴 연결이 끊기지 않도록 주기적으로 주석 프레임을 보낸다
-	const ping = setInterval(() => res.write(": ping\n\n"), 15_000);
+  // 유휴 연결이 끊기지 않도록 주기적으로 주석 프레임을 보낸다
+  const ping = setInterval(() => res.write(": ping\n\n"), 15_000);
 
-	req.on("close", () => {
-		clearInterval(ping);
-		ee.off("chat:add", onAdd);
-		res.end();
-	});
+  req.on("close", () => {
+    clearInterval(ping);
+    ee.off("chat:add", onAdd);
+    res.end();
+  });
 });
 
 // Start server
 app.listen(PORT, () => {
-	console.log(`🚀 Express server running on http://localhost:${PORT}`);
+  console.log(`🚀 Express server running on http://localhost:${PORT}`);
 });
